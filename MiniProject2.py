@@ -49,25 +49,13 @@ for foldername in glob.glob('./export/*'):
 		val_images = temp_images
 	temp_images = []
 	temp_labels = []
-'''
 
-#dataset = tf.contrib.data.make_csv_dataset(filenames, batch_size=32)
-#dataset = dataset.flat_map(
-#	lambda filename: (
-#		tf.data.TextLineDataset(filename))
-#	)
-#iterator = dataset.make_one_shot_iterator()
-#next_element = iterator.get_next()
-#print(next_element)
-
-'''
-print('Done')
 #Print image and label info
-#plt.figure()
-#plt.imshow(train_images[0])
-#plt.colorbar()
-#plt.grid(False)
-#plt.show()
+plt.figure()
+plt.imshow(train_images[0])
+plt.colorbar()
+plt.grid(False)
+plt.show()
 print(train_labels[0])
 #Preprocessing data
 for counter, image in enumerate(train_images):
@@ -81,7 +69,7 @@ class_names = ['stop', 'do not enter']
 
 (x, y, z) = train_images[0].shape
 
-'''
+
 model = keras.Sequential([
 	keras.layers.Flatten(input_shape=(x,y)),
 	keras.layers.Dense(128, activation=tf.nn.relu),
@@ -99,4 +87,3 @@ val_loss, val_acc = model.evaluate(val_images, val_labels)
 #Use test images for accuracy
 test_results = model.evaluate(test_images, test_labels)
 
-'''
