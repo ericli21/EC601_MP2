@@ -9,8 +9,8 @@ import csv
 
 print('\n')
 #Pull dataset and separate in training, validation, and test sets
-train_images = []
-train_labels = []
+#train_images = []
+#train_labels = []
 val_images = []
 val_labels = []
 test_images = []
@@ -31,8 +31,6 @@ for imagename in sorted(glob.glob('./images/*')):
 	all_imagefiles.append(imagename)
 print("Done")
 
-
-
 def parsing(imagefile, label):
 	pre_image1 = tf.read_file(imagefile)
 	pre_image2 = tf.image.decode_jpeg(pre_image1, channels=3)
@@ -41,15 +39,19 @@ def parsing(imagefile, label):
 
 dataset = tf.data.Dataset.from_tensor_slices((all_imagefiles, all_labels))
 dataset = dataset.map(parsing)
-dataset = dataset.batch(8)
 
-iterator = dataset.make_one_shot_iterator()
+(train_images, train_labels) = dataset.load_data()
+'''dataset = dataset.batch(2)
+
+iterator = dataset.make_initializable_iterator()
 images, labels = iterator.get_next()
 with tf.Session() as sess:
-	value = sess.run(images)
-	print(value)
-
-print(dataset.shape)
+	sess.run(iterator.initializer, feed_dict={max_value: 10})
+	for i in range(10):
+		value = sess.run(labels)
+		print(value)
+	
+'''
 '''
 
 all_images = np.array(all_images)
