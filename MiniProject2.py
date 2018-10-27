@@ -107,7 +107,7 @@ with tf.Session() as sess:
 
 
 
-#Old code (wondering if anything can work using this way):
+#Old code Part 1 (wondering if anything can work using this way):
 '''	
 for labelname in sorted(glob.glob('./labels/*')):
 	f = open(labelname, 'r')
@@ -122,50 +122,109 @@ for imagename in sorted(glob.glob('./images/*')):
 	pre_image2 = cv2.resize(pre_image1, dsize=(378,504), interpolation=cv2.INTER_NEAREST)
 	image = np.asarray(pre_image1, np.float32)
 	all_images.append(image)
-
 val_split = 0.2
 split_index = int((1 - val_split) * len(all_images))
 train_images = all_images[:split_index]
 train_labels = all_labels[:split_index]
 val_images = all_images[split_index:]
 val_labels = all_labels[:split_index]
-
 train_images = np.array(train_images)
-
 print("\n")
 print(train_images.shape)
 print(len(train_labels))
 print(train_labels)
 print("\n")
-
 #all_images = np.array(all_images)
 #all_images = all_images / 255.0
-
 #Preprocessing data
 class_names = ['stop', 'do not enter']
-
-
-
 #Build model
-
 model = keras.Sequential([
 	keras.layers.Flatten(input_shape=(378,504)),
 	keras.layers.Dense(128, activation=tf.nn.relu),
 	keras.layers.Dense(10, activation=tf.nn.softmax)
 ])
-
 model.compile(optimizer=tf.train.AdamOptimizer(),
 	loss='sparse_categorical_crossentropy',
 	metrics=['accuracy']
 )
 #Train model
 model.fit(train_images, train_labels, epochs=5)
-
-
-
 #Use validation images for accuracy
 val_loss, val_acc = model.evaluate(val_images, val_labels)
-
 #Use test images for accuracy
 test_results = model.evaluate(test_images, test_labels)
+'''
+
+
+#Old code Part 2
+'''
+#Define lists to store image file names and labels
+all_images = []
+all_labels = []
+for labelname in sorted(glob.glob('./labels/*')):
+	f = open(labelname, 'r')
+	lines = f.readlines()
+	tokens = lines[0].split('\t')
+	if tokens[0] == 'stop':
+		all_labels.append(0)
+	else:
+		all_labels.append(1)
+for imagename in sorted(glob.glob('./images/*')):
+	image = scipy.ndimage.imread(imagename,mode='RGB')
+	image = scipy.misc.imresize(image, size=(378,504))
+	#image = np.array(pre_image1)
+	all_images.append(image)
+all_images = np.array(all_images) / 255.0
+all_labels = np.array(all_labels)
+combined = [all_images, all_labels]
+train_images = combined[0][:60]
+train_labels = combined[1][:60]
+other_images = combined[0][:19]
+other_labels = combined[1][:19]
+val_images = other_images[:-1]
+val_labels = other_labels[:-1]
+test_images = other_images[-1:]
+test_labels = other_labels[-1:]
+
+print(all_images[0].shape)
+print(train_images.shape)
+class_names = ['stop', 'do not enter']
+
+model = keras.Sequential([
+	keras.layers.Flatten(input_shape=(378,504,3)),
+	keras.layers.Conv2D(filters=32, kernel_size=5, activation=tf.nn.relu, data_format='channels_last'),
+	keras.layers.MaxPooling2D(pool_size=3, strides=(1,1)),
+	keras.layers.Dense(300, activation=tf.nn.relu),
+	keras.layers.Dense(2, activation=tf.nn.softmax),
+	])
+model.compile(optimizer=tf.train.AdamOptimizer(),
+	loss='sparse_categorical_crossentropy',
+	metrics=['accuracy']
+	)
+model_2 = keras.applications.ResNet50(weights=None, include_top=False, input_shape=(378,504,3))
+model_2.compile(optimizer=tf.train.AdamOptimizer(),
+	loss='sparse_categorical_crossentropy',
+	metrics=['accuracy']
+	)
+model.fit(train_images, train_labels, epochs=30)
+model_2.fit(train_images, train_labels, epochs=30)
+
+val_loss, val_acc = model.evaluate(val_images, val_labels)
+val_loss_2, val_acc_2 = model_2.evaluate(val_images, val_labels)
+print('Val loss: ', val_loss, 'Val acc:', val_acc)
+print('Val loss 2: ', val_loss_2, 'Val acc 2:', val_acc_2)
+Predict last test image
+prediction = model.predict(test_images)
+prediction_2 = model_2.predict(test_images)
+print(prediction)
+print(prediction_2)
+pred = np.argmax(prediction[0])
+print(pred)
+pred2 = np.argmax(prediction_2[0])
+print(pred2)
+analyze = (pred == test_labels[0])
+analyze_2 = (pred2 == test_labels[0])
+print(analyze)
+print(analyze_2)
 '''
