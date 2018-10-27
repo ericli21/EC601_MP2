@@ -13,3 +13,5 @@ Unfortunately, both models were wrong on the test prediction. This may be due to
 ## Sources
 1. https://www.tensorflow.org/guide/datasets
 2. https://www.tensorflow.org/tutorials/keras/basic_classification
+3. https://keras.io/applications/
+4. https://arxiv.org/ftp/arxiv/papers/1801/1801.00631.pdf
