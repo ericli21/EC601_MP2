@@ -1,4 +1,4 @@
-# EC601 Mini Project 2 Submission - Eric Li
+# EC601 Mini Project 2: Tensorflow CNN model
 This is Python script for the Mini Project 2. I decided to take pictures of "stop" signs and "do not enter" signs, and use Tensorflow to classify each image with these signs. Though it is mostly functional, there still could be improvement on the code and data. 
 
 ## Data
